@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>History Tree</title>
+    </head>
+    <body>
+        <input id="state"/>
+        <button onclick="append()">append</button>
+        <br/>
+        <button onclick="undo()">undo</button>
+        <button onclick="redo()">redo</button>
+        <button onclick="reset()">reset</button>
+        <br/>
+        <input id="_id"/>
+        <button onclick="find()">find</button>
+        <button onclick="revisit()">revisit</button>
+        <br/>
+        <div>history tree</div>
+    </body>
+    <script src="bower_components/d3/d3.js"></script>
+    <script src="history-tree/history-tree.js"></script>
+    <script src="history-tree/history-tree-view.js"></script>
+    <script>
+        var tree = historyTree();
+
+        function append() {
+            var state = document.getElementById('state').value;
+            document.getElementById('state').value = "";
+            tree.append(state);
+            console.log(tree.structure());
+            console.log(tree.path());
+        }
+
+        function undo() {
+            tree.undo();
+            console.log(tree.structure());
+            console.log(tree.path());;
+        }
+
+        function redo() {
+            tree.redo();
+            console.log(tree.structure());
+            console.log(tree.path());
+        }
+
+        function reset() {
+            tree.reset();
+            console.log(tree.structure());
+            console.log(tree.path());
+        }
+
+        function revisit() {
+            var _id = document.getElementById('_id').value;
+            tree.revisit(_id);
+            console.log(tree.structure());
+            console.log(tree.path());
+        }
+
+        function find() {
+            var _id = document.getElementById('_id').value;
+            console.log(_id);
+            console.log(tree.find(_id).structure());
+        }
+    </script>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "history-tree",
+  "homepage": "https://github.com/sdq/history-tree",
+  "description": "",
+  "main": "",
+  "authors": [
+    "sdq"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "d3": "4.13.0",
+    "jquery": "^3.3.1"
+  }
+}
