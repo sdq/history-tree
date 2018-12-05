@@ -2,6 +2,21 @@
 <html>
     <head>
         <title>History Tree</title>
+        <style>
+        .node circle {
+            fill: #fff;
+            stroke: steelblue;
+            stroke-width: 3px;
+        }
+        .node text {
+            font: 12px sans-serif;
+        }
+        .link {
+            fill: none;
+            stroke: #ccc;
+            stroke-width: 2px;
+        }
+        </style>
     </head>
     <body>
         <input id="state"/>
@@ -15,12 +30,14 @@
         <button onclick="find()">find</button>
         <button onclick="revisit()">revisit</button>
         <br/>
-        <div>history tree</div>
+        <div id="chart">history tree</div>
     </body>
     <script src="bower_components/d3/d3.js"></script>
     <script src="history-tree/history-tree.js"></script>
     <script src="history-tree/history-tree-view.js"></script>
     <script>
+        var chart = historyTreeView();
+        chart.container("#chart");
         var tree = historyTree();
 
         function append() {
@@ -29,24 +46,28 @@
             tree.append(state);
             console.log(tree.structure());
             console.log(tree.path());
+            chart.render(tree.structure());
         }
 
         function undo() {
             tree.undo();
             console.log(tree.structure());
             console.log(tree.path());;
+            chart.render(tree.structure());
         }
 
         function redo() {
             tree.redo();
             console.log(tree.structure());
             console.log(tree.path());
+            chart.render(tree.structure());
         }
 
         function reset() {
             tree.reset();
             console.log(tree.structure());
             console.log(tree.path());
+            chart.render(tree.structure());
         }
 
         function revisit() {
@@ -54,12 +75,17 @@
             tree.revisit(_id);
             console.log(tree.structure());
             console.log(tree.path());
+            chart.render(tree.structure());
         }
 
         function find() {
             var _id = document.getElementById('_id').value;
             console.log(_id);
             console.log(tree.find(_id).structure());
+            chart.render(tree.structure());
         }
+    </script>
+    <script>
+        
     </script>
 </html>
