@@ -1,5 +1,6 @@
 let historyTreeView = function() {
     let historyTreeView = {},
+        tree = historyTree(),
         margin = {top: 20, right: 90, bottom: 30, left: 90},
         width = 960 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom,
@@ -17,6 +18,63 @@ let historyTreeView = function() {
                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         return historyTreeView;
     };
+
+    historyTreeView.load = function(_) {
+        tree.load(_)
+        return historyTreeView
+    }
+
+    historyTreeView.append = function(state) {
+        tree.append(state);
+        console.log(tree.structure());
+        console.log(tree.path());
+        historyTreeView.render(tree.structure())
+        return historyTreeView;
+    }
+
+    historyTreeView.undo = function() {
+        tree.undo();
+        console.log(tree.structure());
+        console.log(tree.path());
+        historyTreeView.render(tree.structure())
+        return historyTreeView;
+    }
+
+    historyTreeView.redo = function() {
+        tree.redo();
+        console.log(tree.structure());
+        console.log(tree.path());
+        historyTreeView.render(tree.structure())
+        return historyTreeView;
+    }
+
+    historyTreeView.reset = function() {
+        tree.reset();
+        console.log(tree.structure());
+        console.log(tree.path());
+        historyTreeView.render(tree.structure())
+        return historyTreeView;
+    }
+
+    historyTreeView.revisit = function(_id) {
+        tree.revisit(_id);
+        console.log(tree.structure());
+        console.log(tree.path());
+        historyTreeView.render(tree.structure())
+        return historyTreeView;
+    }
+
+    historyTreeView.find = function(_id) {
+        return tree.find(_id).structure();
+    }
+
+    historyTreeView.path = function(_) {
+        return tree.path();
+    }
+
+    historyTreeView.structure = function(_) {
+        return tree.structure();
+    }
 
     historyTreeView.render = function(data) {
 
@@ -54,6 +112,8 @@ let historyTreeView = function() {
         nodeEnter.append('circle')
             .attr('class', 'node')
             .attr('r', 1e-6)
+            .style('stroke', 'steelblue')
+            .style('stroke-width', '3px')
             .style("fill", function(d) {
                 console.log(d);
                 return d._children ? "lightsteelblue" : "#fff";
@@ -66,7 +126,8 @@ let historyTreeView = function() {
             .attr("text-anchor", function(d) {
                 return d.children || d._children ? "end" : "start";
             })
-            .text(function(d) { return d.data.id; });
+            .text(function(d) { return d.data.id; })
+            .style("font", "12px sans-serif");
 
         // UPDATE
         var nodeUpdate = nodeEnter.merge(node);
@@ -115,7 +176,10 @@ let historyTreeView = function() {
             .attr('d', function(d){
                 var o = {x: root.x0, y: root.y0}
                 return diagonal(o, o)
-            });
+            })
+            .style("fill", "none")
+            .style("stroke", "#ccc")
+            .style("stroke-width", "2px");
 
         // UPDATE
         var linkUpdate = linkEnter.merge(link);

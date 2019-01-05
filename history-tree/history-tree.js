@@ -88,6 +88,18 @@ let historyTree = function() {
         root = null,
         count = 0;
 
+    tree.load = function(_) {
+        try {
+            var treeJson = JSON.parse(_);
+            // TODO: load json to history tree
+            return tree
+        }
+        catch(error) {
+            console.error(error);
+            return tree
+        }
+    }
+
     tree.root = function(_) {
         if (!arguments.length) return root;
         root.state = _;
@@ -114,6 +126,7 @@ let historyTree = function() {
             node.father(tree.activeNode());
             tree.activeNode().addChild(node);
         }
+        return tree;
     }
 
     tree.undo = function() {
@@ -130,6 +143,7 @@ let historyTree = function() {
         father.addChild(current);
         
         father.activeIndex(-1);
+        return tree;
     }
 
     tree.redo = function() {
@@ -139,6 +153,7 @@ let historyTree = function() {
         }
         let nextIndex = tree.activeNode().children().length - 1;
         tree.activeNode().activeIndex(nextIndex);
+        return tree;
     }
 
     tree.reset = function() {
@@ -147,6 +162,7 @@ let historyTree = function() {
             node = node.father();
             node.activeIndex(-1);
         }
+        return tree;
     }
 
     tree.revisit = function(_id) {
@@ -154,12 +170,14 @@ let historyTree = function() {
         let node = tree.find(_id);
         if (node == null) {
             console.log("Node doesn't exist.")
+            return tree;
         }
         while (node.father() != null) {
             let index = node.father().children().indexOf(node);
             node.father().activeIndex(index);
             node = node.father();
         }
+        return tree;
     }
 
     tree.find = function(_id) {
@@ -188,7 +206,7 @@ let historyTree = function() {
     tree.path = function() {
         if (root == null) {
             console.log("no data");
-            return null;
+            return [];
         } else {
             let path = "[" + root.path() + "]";
             return path;
