@@ -68,16 +68,17 @@ let historyTreeNode = function() {
     }
 
     node.path = function() {
-        let nodeJson = "";
-        nodeJson += "{\"id\":\"" + _id + "\",";
-        nodeJson += "\"state\":\"" + state + "\"}";
+        let path = []
+        path.push({
+            "id": _id,
+            "state": state
+        })
 
         if (activeIndex != -1) {
-            nodeJson += ",";
-            nodeJson += children[activeIndex].path();
+            path = path.concat(children[activeIndex].path())
         }
 
-        return nodeJson;
+        return path;
     }
 
     return node;
@@ -208,8 +209,7 @@ let historyTree = function() {
             console.log("no data");
             return [];
         } else {
-            let path = "[" + root.path() + "]";
-            return path;
+            return root.path();
         }
     }
 
