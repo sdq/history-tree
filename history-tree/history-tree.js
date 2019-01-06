@@ -47,38 +47,47 @@ let historyTreeNode = function() {
     }
 
     node.structure = function() {
-        let nodeJson = "";
-        nodeJson += "{\"id\":\"" + _id + "\",";
-        nodeJson += "\"state\":\"" + state + "\",";
+        let structure = {
+            "id": _id,
+            "state": state,
+            "active": activeIndex,
+            "father": null,
+            "children": []
+        };
         if (father != null) {
-            nodeJson += "\"father\":\"" + father._id() + "\",";
-        }
-        nodeJson += "\"active\":\"" + activeIndex + "\",";
-        nodeJson += "\"children\":[";
-        let childrenJson = "";
+            structure["father"] = father._id();
+        };
         for (var i in children) {
-            childrenJson += children[i].structure() + ",";
-        }
-        if (childrenJson.length > 0) {
-            childrenJson = childrenJson.slice(0,-1);
-        }
-        nodeJson += childrenJson;
-        nodeJson += "]}";
-        return nodeJson;
+            structure.children.push(children[i].structure());
+        };
+        return structure
     }
 
     node.path = function() {
         let path = []
-        path.push({
-            "id": _id,
-            "state": state
-        })
+        // path.push({
+        //     "id": _id,
+        //     "state": state
+        // });
+        path.push(_id);
 
         if (activeIndex != -1) {
             path = path.concat(children[activeIndex].path())
         }
 
         return path;
+    }
+
+    node.countLeaves = function() {
+        var count = 0;
+        if (children.length == 0) {
+            count = 1
+        } else {
+            for (i in children) {
+                count += children[i].countLeaves();
+            }
+        }
+        return count;
     }
 
     return node;
@@ -131,8 +140,8 @@ let historyTree = function() {
     }
 
     tree.undo = function() {
-        if (tree.activeNode().father() == null) {
-            console.log("You cannot undo.");
+        if (tree.activeNode() == null || tree.activeNode().father() == null) {
+            console.log("You have nothing to undo.");
             return;
         }
         let current = tree.activeNode();
@@ -148,7 +157,7 @@ let historyTree = function() {
     }
 
     tree.redo = function() {
-        if (tree.activeNode().children().length == 0) {
+        if (tree.activeNode() == null || tree.activeNode().children().length == 0) {
             console.log("You have nothing to redo.");
             return;
         }
@@ -158,6 +167,10 @@ let historyTree = function() {
     }
 
     tree.reset = function() {
+        if (tree.activeNode() == null) {
+            console.log("You have nothing to reset.");
+            return;
+        }
         let node = tree.activeNode();
         while (node.father() != null) {
             node = node.father();
@@ -210,6 +223,15 @@ let historyTree = function() {
             return [];
         } else {
             return root.path();
+        }
+    }
+
+    tree.countPaths = function() {
+        if (root == null) {
+            console.log("no data");
+            return 0;
+        } else {
+            return root.countLeaves();
         }
     }
 
