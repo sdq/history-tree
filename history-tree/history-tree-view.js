@@ -7,18 +7,12 @@ let historyTreeView = function() {
         nodeWidth = 65,
         nodeHeight = 30,
         nodeMargin = 10,
-        container = null,
-        svg = null;
+        container = null;
 
     historyTreeView.container = function(_) {
         if (!arguments.length) return container;
         container = d3.select(_)
             .style('position','relative');
-        // svg = container.append("svg")
-        //             .attr("width", width + margin.right + margin.left)
-        //             .attr("height", height + margin.top + margin.bottom)
-        //             .append("g")
-        //             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         return historyTreeView;
     };
 
@@ -76,6 +70,7 @@ let historyTreeView = function() {
     }
 
     historyTreeView.render = function() {
+        console.log("##############render#############");
         container.html("");
         var structure = tree.structure();
         var path = tree.path();
@@ -83,40 +78,29 @@ let historyTreeView = function() {
         historyTreeView.renderPath(path, 0, 10);
         var x_offset = (path.length - 1) * (nodeWidth+nodeMargin);
         var y_offset = 10;
-        // for (var i = path.length-1; i>=0; i--) {
-        //     var node = tree.find(path[i]);
-        //     historyTreeView.renderFromNode(node);
-        // }
-        historyTreeView.renderFromNode(node, x_offset, y_offset);
-        while (node.father() != null) {
-            var father = node.father();
+        y_offset += nodeHeight + nodeMargin;
+        while (node != null) {
+            y_offset = historyTreeView.renderFromNode(node, x_offset, y_offset);
             x_offset = x_offset - (nodeWidth+nodeMargin);
-            y_offset = historyTreeView.renderFromNode(father, x_offset, y_offset);
-            console.log(y_offset);
-            node = father;
+            node = node.father();
         }
     }
 
     historyTreeView.renderFromNode = function(node, x, y) {
-        //historyTreeView.addNodeView(node._id(), x, y);
-
-        var dx = nodeWidth + nodeMargin, dy = nodeHeight + nodeMargin;
-        if (node.activeIndex() == -1) {
-            dy = 0; // following
-        }
+        var dx = nodeWidth + nodeMargin, dy = 0;
         var children = node.children();
         if (children.length > 0) {
             for (i in children) {
-                if (tree.path().includes(children[i]._id())) {
+                var child = children[i]
+                if (tree.path().includes(child._id())) {
                     continue;
                 } else {
-                    console.log("render:" + children[i]._id());
-                    historyTreeView.addInactiveNodeView(children[i]._id(), x + dx, y + dy);
-                    historyTreeView.renderFromNode(children[i], x + dx, y + dy);
-                    if (children[i].activeIndex() == -1) {
-                        dy += children[i].countLeaves() * (nodeHeight + nodeMargin);
+                    historyTreeView.addInactiveNodeView(child._id(), x + dx, y + dy);
+                    historyTreeView.renderFromNode(child, x + dx, y + dy);
+                    if (child.activeIndex() == -1) {
+                        dy += child.countLeaves() * (nodeHeight + nodeMargin);
                     } else {
-                        dy += (children[i].countLeaves()-1) * (nodeHeight + nodeMargin);
+                        dy += (child.countLeaves()-1) * (nodeHeight + nodeMargin);
                     }
                 }
             }
@@ -175,29 +159,6 @@ let historyTreeView = function() {
                 .style('background-color', 'white');
             })
     }
-
-    // historyTreeView.calcY = function(node) {
-    //     var path = historyTreeView.path();
-    //     if (path.includes(node._id())) {
-    //         return 0;
-    //     }
-    //     var y = (nodeHeight+nodeMargin);
-    //     while (node.father() != null) {
-    //         var father_node = node.father();
-    //         var children = father_node.children();
-    //         for (i in children) {
-    //             if (path.includes(children[i]._id())) {
-    //                 continue;
-    //             }
-    //             if (node._id() == children[i]._id()) {
-    //                 break;
-    //             }
-    //             y += children[i].countLeaves() * (nodeHeight+nodeMargin);
-    //         }
-    //         node = father_node;
-    //     }
-    //     return y;
-    // }
 
     return historyTreeView;
 }
