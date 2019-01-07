@@ -70,9 +70,7 @@ let historyTreeView = function() {
     }
 
     historyTreeView.render = function() {
-        console.log("##############render#############");
         container.html("");
-        var structure = tree.structure();
         var path = tree.path();
         var node = tree.activeNode();
         historyTreeView.renderPath(path, 0, 10);
@@ -135,6 +133,9 @@ let historyTreeView = function() {
                 d3.select(this)
                 .style('background-color', 'white');
             })
+            .on('click', function () {
+                historyTreeView.revisit(d);
+            })
     }
 
     historyTreeView.addInactiveNodeView = function(d, x, y) {
@@ -157,6 +158,9 @@ let historyTreeView = function() {
             .on('mouseout', function () {
                 d3.select(this)
                 .style('background-color', 'white');
+            })
+            .on('click', function () {
+                historyTreeView.revisit(d);
             })
     }
 
