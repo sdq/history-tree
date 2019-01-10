@@ -90,6 +90,21 @@ let historyTreeNode = function() {
         return count;
     }
 
+    node.maxDepth = function() {
+        var depth = 1;
+        if (children.length != 0) {
+            var childrenMaxDepth = 1;
+            for (i in children) {
+                var childrenDepth = children[i].maxDepth();
+                if (childrenDepth > childrenMaxDepth) {
+                    childrenMaxDepth = childrenDepth;
+                }
+            }
+            depth += childrenMaxDepth;
+        }
+        return depth;
+    }
+
     return node;
 }
 
@@ -121,7 +136,6 @@ let historyTree = function() {
         while(node.activeIndex() != -1) {
             node = node.activeNode();
         }
-        //console.log(node.state());
         return node;
     }
 
@@ -235,6 +249,15 @@ let historyTree = function() {
         }
     }
 
+    tree.maxDepth = function() {
+        if (root == null) {
+            console.log("no data");
+            return 0;
+        } else {
+            return root.maxDepth();
+        }
+    }
+
     return tree;
 }
 
@@ -247,7 +270,8 @@ let historyTreeView = function() {
         nodeWidth = 65,
         nodeHeight = 30,
         nodeMargin = 10,
-        container = null;
+        container = null,
+        svg = null;
 
     historyTreeView.container = function(_) {
         if (!arguments.length) return container;
@@ -263,37 +287,31 @@ let historyTreeView = function() {
 
     historyTreeView.append = function(state) {
         tree.append(state);
-        console.log(tree.structure());
-        console.log(tree.countPaths());
-        historyTreeView.render(tree.structure())
+        historyTreeView.render()
         return historyTreeView;
     }
 
     historyTreeView.undo = function() {
         tree.undo();
-        console.log(tree.structure());
-        historyTreeView.render(tree.structure())
+        historyTreeView.render()
         return historyTreeView;
     }
 
     historyTreeView.redo = function() {
         tree.redo();
-        //console.log(tree.structure());
-        historyTreeView.render(tree.structure())
+        historyTreeView.render()
         return historyTreeView;
     }
 
     historyTreeView.reset = function() {
         tree.reset();
-        console.log(tree.structure());
-        historyTreeView.render(tree.structure())
+        historyTreeView.render()
         return historyTreeView;
     }
 
     historyTreeView.revisit = function(_id) {
         tree.revisit(_id);
-        console.log(tree.structure());
-        historyTreeView.render(tree.structure());
+        historyTreeView.render();
         return historyTreeView;
     }
 
@@ -313,9 +331,21 @@ let historyTreeView = function() {
         container.html("");
         var path = tree.path();
         var node = tree.activeNode();
-        historyTreeView.renderPath(path, 0, 10);
-        var x_offset = (path.length - 1) * (nodeWidth+nodeMargin);
         var y_offset = 10;
+        var x_offset = 5;
+        svg = container.append('svg')
+            .style('position','absolute')
+            .style('width', x_offset + tree.maxDepth() * (nodeWidth+nodeMargin))
+            .style('height', y_offset + (tree.countPaths()+1) * (nodeHeight + nodeMargin))
+            .style('z-index', -1);
+        for (var i=0; i<tree.countPaths();i++) {
+            historyTreeView.renderFrame(y_offset + i * (nodeHeight + nodeMargin));
+        }
+        if (node.children().length != 0) {
+            historyTreeView.renderFrame(y_offset + tree.countPaths() * (nodeHeight + nodeMargin));
+        }
+        historyTreeView.renderPath(path, x_offset, y_offset);
+        x_offset += (path.length - 1) * (nodeWidth+nodeMargin);
         y_offset += nodeHeight + nodeMargin;
         while (node != null) {
             y_offset = historyTreeView.renderFromNode(node, x_offset, y_offset);
@@ -348,12 +378,24 @@ let historyTreeView = function() {
 
     historyTreeView.renderPath = function(path, x_offset, y_offset) {
         for (i in path) {
-            historyTreeView.addNodeView(path[i], (nodeWidth+nodeMargin)*i + x_offset, y_offset);
+            if (i == path.length-1) {
+                historyTreeView.addCurrentNodeView(path[i], (nodeWidth+nodeMargin)*i + x_offset, y_offset);
+            } else {
+                historyTreeView.addNodeView(path[i], (nodeWidth+nodeMargin)*i + x_offset, y_offset);
+            }
         }
     }
 
     historyTreeView.addNodeView = function(d, x, y) {
+        svg.append('line')
+            .style('position','absolute')
+            .attr("x1", x - 45)
+            .attr("y1", y + 15)
+            .attr("x2", x)
+            .attr("y2", y + 15)
+            .style("stroke", "#979797")
         container.append('div')
+            .attr('id', 'history-node-' + d)
             .style('position','absolute')
             .style('left', x + "px")
             .style('top', y + "px")
@@ -365,43 +407,144 @@ let historyTreeView = function() {
             .text(d)
             .on('mouseover', function() {
                 d3.select(this)
-                .style('background-color','blue');
+                .style('background-color','#F5A623');
                 var node = tree.find(d);
-                console.log(node.state());
+                historyTreeView.displayHoverTip("id:"+d+"<br/>state:" + node.state());
             })
             .on('mouseout', function () {
                 d3.select(this)
                 .style('background-color', 'white');
+                historyTreeView.removeHoverTip(d);
             })
             .on('click', function () {
                 historyTreeView.revisit(d);
             })
     }
 
-    historyTreeView.addInactiveNodeView = function(d, x, y) {
+    historyTreeView.addCurrentNodeView = function(d, x, y) {
+        svg.append('line')
+            .style('position','absolute')
+            .attr("x1", x - 35)
+            .attr("y1", y + 15)
+            .attr("x2", x)
+            .attr("y2", y + 15)
+            .style("stroke", "#979797")
         container.append('div')
+            .attr('id', 'history-node-' + d)
             .style('position','absolute')
             .style('left', x + "px")
             .style('top', y + "px")
             .style('width', 65 + "px")
             .style('height', 30 + "px")
             .style('background-color', 'white')
-            .style('border', '2px solid black')
+            .style('border', '2px solid #F5A623')
             .style('border-radius', '5px')
             .text(d)
             .on('mouseover', function() {
                 d3.select(this)
-                .style('background-color','blue');
+                .style('background-color','#F5A623');
                 var node = tree.find(d);
-                console.log(node.state());
+                historyTreeView.displayHoverTip("id:"+d+"<br/>state:" + node.state());
             })
             .on('mouseout', function () {
                 d3.select(this)
                 .style('background-color', 'white');
+                historyTreeView.removeHoverTip(d);
+            })
+    }
+
+    historyTreeView.addInactiveNodeView = function(d, x, y) {
+        var node = tree.find(d);
+        svg.append('line')
+            .style('position','absolute')
+            .attr("x1", x - 35)
+            .attr("y1", y + 15)
+            .attr("x2", x)
+            .attr("y2", y + 15)
+            .style("stroke", "#979797")
+        if (historyTreeView.path().includes(node.father()._id())) {
+            svg.append('line')
+                .style('position','absolute')
+                .attr("x1", x - 35)
+                .attr("y1", y + 15)
+                .attr("x2", x - 35)
+                .attr("y2", 15)
+                .style("stroke", "#979797")
+        } else if (node.father().children().length > 1) {
+            var father_y = d3.select('#history-node-' + node.father()._id()).style('top');
+            svg.append('line')
+                .style('position','absolute')
+                .attr("x1", x - 35)
+                .attr("y1", y + 15)
+                .attr("x2", x - 35)
+                .attr("y2", father_y)
+                .style("stroke", "#979797")
+        }
+        container.append('div')
+            .attr('id', 'history-node-' + d)
+            .style('position','absolute')
+            .style('left', x + "px")
+            .style('top', y + "px")
+            .style('width', 65 + "px")
+            .style('height', 30 + "px")
+            .style('background-color', 'white')
+            .style('border', '2px solid #979797')
+            .style('border-radius', '5px')
+            .text(d)
+            .on('mouseover', function() {
+                d3.select(this)
+                .style('background-color','#F5A623')
+                .style('border-color','#F5A623');
+                historyTreeView.displayHoverTip("id:"+d+"<br/>state:" + node.state());
+            })
+            .on('mouseout', function () {
+                d3.select(this)
+                .style('background-color', 'white')
+                .style('border-color','#979797');
+                historyTreeView.removeHoverTip(d);
             })
             .on('click', function () {
                 historyTreeView.revisit(d);
             })
+    }
+
+    historyTreeView.renderFrame = function(y) {
+        var width = tree.maxDepth() * 75 + 5;
+        container.append('div')
+            .style('z-index', -2)
+            .style('position','absolute')
+            .style('left', "0px")
+            .style('top', y-2 + "px")
+            .style('width', width + "px")
+            .style('height', 36 + "px")
+            .style('background-color', 'white')
+            .style('border', '1px solid #E9EFF4')
+            .style('border-radius', '5px')
+    }
+
+    historyTreeView.displayHoverTip = function(str) {
+        // hovertip
+        let offset = d3.mouse(container.node());
+        container.append("div")
+            .attr("class", "hoverTip")
+            .style("position", "absolute")
+            .style("left", offset[0] + 30 + "px")
+            .style("top", offset[1] + 10 + "px")
+            .style("background", "white")
+            .style("border-radius", "5px")
+            .style("padding-left", "8px")
+            .style("padding-right", "8px")
+            .style("padding-top", "4px")
+            .style("padding-bottom", "4px")
+            .style("box-shadow", "2px 2px 2px 2px #DFDFDF")
+            .style("color", "#646464")
+            .style("font-size", "12px")
+            .style("max-width", "200px")
+            .html(str);
+    }
+
+    historyTreeView.removeHoverTip = function() {
+        container.selectAll('.hoverTip').remove();
     }
 
     return historyTreeView;
