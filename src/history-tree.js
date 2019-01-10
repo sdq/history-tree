@@ -258,6 +258,11 @@ let historyTree = function() {
         }
     }
 
+    tree.export = function() {
+        var structure = tree.structure();
+        return JSON.stringify(structure);
+    }
+
     return tree;
 }
 
@@ -545,6 +550,10 @@ let historyTreeView = function() {
 
     historyTreeView.removeHoverTip = function() {
         container.selectAll('.hoverTip').remove();
+    }
+
+    historyTreeView.export = function() {
+        return tree.export();
     }
 
     return historyTreeView;

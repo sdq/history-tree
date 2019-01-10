@@ -10,10 +10,7 @@
         <button onclick="undo()">undo</button>
         <button onclick="redo()">redo</button>
         <button onclick="reset()">reset</button>
-        <br/>
-        <input id="_id"/>
-        <button onclick="find()">find</button>
-        <button onclick="revisit()">revisit</button>
+        <button onclick="exportJson()">export</button>
         <br/>
         <div id="history-tree-chart"></div>
     </body>
@@ -42,15 +39,8 @@
             chart.reset();
         }
 
-        function revisit() {
-            var _id = document.getElementById('_id').value;
-            chart.revisit(_id);
-        }
-
-        function find() {
-            var _id = document.getElementById('_id').value;
-            console.log(_id);
-            console.log(chart.find(_id));
+        function exportJson() {
+            console.log(chart.export());
         }
     </script>
     <script>
