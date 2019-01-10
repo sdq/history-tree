@@ -10,56 +10,40 @@
         <button onclick="undo()">undo</button>
         <button onclick="redo()">redo</button>
         <button onclick="reset()">reset</button>
+        <button onclick="exportJson()">export</button>
         <br/>
-        <input id="_id"/>
-        <button onclick="find()">find</button>
-        <button onclick="revisit()">revisit</button>
-        <br/>
-        <div>history tree</div>
+        <div id="history-tree-chart"></div>
     </body>
     <script src="bower_components/d3/d3.js"></script>
-    <script src="history-tree/history-tree.js"></script>
-    <script src="history-tree/history-tree-view.js"></script>
+    <script src="src/history-tree.js"></script>
     <script>
+        var chart = historyTreeView();
+        chart.container("#history-tree-chart");
         var tree = historyTree();
 
         function append() {
             var state = document.getElementById('state').value;
             document.getElementById('state').value = "";
-            tree.append(state);
-            console.log(tree.structure());
-            console.log(tree.path());
+            chart.append(state);
         }
 
         function undo() {
-            tree.undo();
-            console.log(tree.structure());
-            console.log(tree.path());;
+            chart.undo();
         }
 
         function redo() {
-            tree.redo();
-            console.log(tree.structure());
-            console.log(tree.path());
+            chart.redo();
         }
 
         function reset() {
-            tree.reset();
-            console.log(tree.structure());
-            console.log(tree.path());
+            chart.reset();
         }
 
-        function revisit() {
-            var _id = document.getElementById('_id').value;
-            tree.revisit(_id);
-            console.log(tree.structure());
-            console.log(tree.path());
+        function exportJson() {
+            console.log(chart.export());
         }
-
-        function find() {
-            var _id = document.getElementById('_id').value;
-            console.log(_id);
-            console.log(tree.find(_id).structure());
-        }
+    </script>
+    <script>
+        
     </script>
 </html>
