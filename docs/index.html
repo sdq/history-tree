@@ -4,6 +4,7 @@
         <title>History Tree</title>
     </head>
     <body>
+        <h2>History Tree [<a href="https://github.com/sdq/history-tree">Github</a>]</h2>
         <input id="state"/>
         <button onclick="append()">append</button>
         <br/>
@@ -14,8 +15,8 @@
         <br/>
         <div id="history-tree-chart"></div>
     </body>
-    <script src="bower_components/d3/d3.js"></script>
-    <script src="src/history-tree.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="history-tree.js"></script>
     <script>
         var chart = historyTreeView();
         chart.container("#history-tree-chart");
