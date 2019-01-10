@@ -1,3 +1,8 @@
+/**
+ * @link https://github.com/sdq/history-tree
+ * @author sdq <shidanqingnet@gmail.com>
+ */
+
 let historyTreeNode = function() {
     let node = {},
         _id = -1,
