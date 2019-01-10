@@ -4,18 +4,18 @@ An interactive history tree for undo/redo/reset/revisit in javascript. [demo Lin
 
 ![Demo](./demo.gif)
 
-###Interaction design 
-
+Interaction design 
+------
 ![interaction](./interaction-demo.png)
 
-###Installation
-
+Installation
+------
 ```
 <script src="https://sdq.ai/history-tree/history-tree.js"></script>
 ```
 
-###Use history-tree structure
-
+Use history-tree structure
+------
 ```
 var tree = historyTree();
 tree.append(state);
@@ -27,8 +27,8 @@ tree.find(id);
 tree.log(chart.export());
 ```
 
-###Use history-tree-view
-
+Use history-tree-view
+------
 ```
 var chart = historyTreeView();
 chart.container("#your-container-id");
