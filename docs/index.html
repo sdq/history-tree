@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>History Tree</title>
+    </head>
+    <body>
+        <h2>History Tree [<a href="https://github.com/sdq/history-tree">Github</a>]</h2>
+        <input id="state"/>
+        <button onclick="append()">append</button>
+        <br/>
+        <button onclick="undo()">undo</button>
+        <button onclick="redo()">redo</button>
+        <button onclick="reset()">reset</button>
+        <button onclick="exportJson()">export</button>
+        <br/>
+        <div id="history-tree-chart"></div>
+    </body>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="history-tree.js"></script>
+    <script>
+        var chart = historyTreeView();
+        chart.container("#history-tree-chart");
+
+        function append() {
+            var state = document.getElementById('state').value;
+            document.getElementById('state').value = "";
+            chart.append(state);
+        }
+
+        function undo() {
+            chart.undo();
+        }
+
+        function redo() {
+            chart.redo();
+        }
+
+        function reset() {
+            chart.reset();
+        }
+
+        function exportJson() {
+            console.log(chart.export());
+        }
+    </script>
+    <script>
+        
+    </script>
+</html>
