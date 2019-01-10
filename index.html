@@ -15,14 +15,13 @@
         <button onclick="find()">find</button>
         <button onclick="revisit()">revisit</button>
         <br/>
-        <div id="chart"></div>
+        <div id="history-tree-chart"></div>
     </body>
     <script src="bower_components/d3/d3.js"></script>
-    <script src="history-tree/history-tree.js"></script>
-    <script src="history-tree/history-tree-view.js"></script>
+    <script src="src/history-tree.js"></script>
     <script>
         var chart = historyTreeView();
-        chart.container("#chart");
+        chart.container("#history-tree-chart");
         var tree = historyTree();
 
         function append() {
