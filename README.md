@@ -4,7 +4,7 @@ An interactive history tree for undo/redo/reset/revisit in javascript. [demo Lin
 
 ![Demo](./demo.gif)
 
-###Structure Design 
+###Interaction design 
 
 ![interaction](./interaction-demo.png)
 
